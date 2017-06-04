@@ -95,9 +95,6 @@ R CMD BATCH --no-save --no-restore ${script_path}/edgeR_isoform3.R
 cd $DE_dir/winterDisVsSummerHealth
 ${script_path}/trinity_util/analyze_diff_expr.pl --matrix ../winter_counts.tab -P 1e-2 -C 2 --samples samples_file
 
-
-
-$horse_trans/resources/NCBI/GFF/ref_EquCab2.0_top_level.gff3
 ## B) Extend NCBI annotation
 GFF=$genome_dir/ref_EquCab2.0_top_level.gff3;
 grep "ID=rna" $GFF | awk -F "\t" '{print $9}' | awk -F "[,;]" -v OFS="\t" '{ delete vars; for(i = 1; i <= NF; ++i) { n = index($i, "="); if(n) { vars[substr($i, 1, n - 1)] = substr($i, n + 1) } } Dbxref = vars["Dbxref"]; Name = vars["Name"]; gene = vars["gene"]; product = vars["product"]; } { print Dbxref,Name,gene,product }' > NCBI_TransInfo.txt;
@@ -107,8 +104,6 @@ printf '1\ni\nGeneID\tRefSeqID\tGeneSymbol\tDescription\n.\nw\n' | ed -s NCBI_Tr
 Rscript -e 'args=(commandArgs(TRUE));data1=read.delim(args[1],quote = "");data2=read.delim(args[2],quote = "");'\
 'dataMerge=merge(data1,data2,by.x="ID",by.y="RefSeqID",all.x=T,all.y=F);'\
 'write.csv(dataMerge,"Summary_analysis_annotated.csv",row.names =F);' Summary_analysis.txt NCBI_TransInfo.txt
-
-
 
 ########################
 ## re-run differential expression with refined transcriptome
